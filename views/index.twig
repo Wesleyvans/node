@@ -1,0 +1,76 @@
+{% extends 'layout.twig' %}
+{% block content %}
+
+{#<canvas id="canvas" width="800px" height="400px"></canvas>#}
+    {##}
+
+
+<div id="wrapper">
+    <div class="msgwrapper">
+        <ul id="messages">
+
+        </ul>
+    </div>
+    <form action="" class="mainform">
+        <div class="msgbox">
+            <div class="">
+                <input type="text" class="form-control sndMessage" id="m" autocomplete="off" placeholder="Message"/>
+                <i class="fa fa-paper-plane send" aria-hidden="true"></i>
+            </div>
+            <span class="result"> test </span>
+        </div>
+
+    </form>
+</div>
+
+    <form class="test" action="localhost:3000/chat">
+        <input type="submit" class="test">
+    </form>
+
+<script src="/socket.io/socket.io.js"></script>
+{#<script type="text/javascript" src="/javascripts/canvas.js"></script>#}
+<script>
+    $('.test').submit(function(){
+        $.post("localhost:3000/chat", {"text" : "test"});
+    })
+
+    $('.mainform').submit(function(e){
+        e.preventDefault();
+    });
+
+    $(function(){
+        var socket = io();
+        $('form').submit(function(){
+            sendMessage();
+        });
+
+        $('.send').on('click', function(){
+            sendMessage();
+        });
+
+        function sendMessage(){
+            // Chatfunctie Client - Slack
+            var url = "https://hooks.slack.com/services/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";
+            var payload = {"text" : $('#m').val()};
+            $.post(url, JSON.stringify(payload),function(data){
+                $('.result').text(data);
+            })
+
+// Chatfunctie server - client
+//            if($('#m').val() != '') {
+//                socket.emit('chatmessage', $('#m').val());
+//                $('#m').val('');
+//                return false;
+//            }
+//            else {
+//                console.log('leeg');
+//            }
+        }
+
+        socket.on('chatmessage', function(msg){
+            $('#messages').append($('<li>').text(msg));
+        });
+    });
+
+</script>
+{% endblock %}
